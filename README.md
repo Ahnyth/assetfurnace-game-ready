@@ -58,4 +58,4 @@ outline check of [image-to-3dlab#292](https://github.com/Bingeljell/image-to-3dl
 
 It has built 29 of the figures in a small mobile game made with AssetFurnace.
 
-Licence: Apache-2.0.
+Licence: Apache-2.0 (see `LICENSE` and `NOTICE`: the scripts build on [image-to-3dlab](https://github.com/Bingeljell/image-to-3dlab), AssetFurnace itself).
