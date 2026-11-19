@@ -16,7 +16,8 @@ Give it the GLB from Rig (or Animate). It writes one GLB with:
   seen. The drop is **checked in motion**: the figure is posed in a run, a dodge, a fall and a reach and seen from
   twelve sides, and any dropped face that would show as a hole is put back;
 - **real height** with the feet on the floor; a **sole the generator made up** below the pictures' feet (it finds
-  the Finish run in the rig's licence record) is cut off, or pressed flat where cutting would leave splinters;
+  the Finish run in the rig's licence record) is cut off, and thin plates of it the cut leaves in front of the toe
+  are cleared and the toe closed (a heel only a little too high is pressed flat instead);
 - **engine bone names** (Unity's Humanoid or Mixamo, or the rig's own), finger bones kept or folded into the hands,
   at most four bones per vertex;
 - optional **glow** on thin lines of the colours you name (`#29e6ff`), never on the face or the hands;
