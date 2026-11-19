@@ -44,10 +44,11 @@ LOD0.
 In the studio: Add-ons, Game-ready. From the command line:
 
     ./lab addon add --unlisted https://github.com/Ahnyth/assetfurnace-game-ready@<commit>
-    ./lab addon run game-ready figure --model output/animate/<run>/<name>_rigged.glb --height 1.8 \
-        --triangles 14000 --atlas 1024 --bones unity --fingers keep --glow none
-    ./lab addon run game-ready prop --model output/finish/<run>/<name>_5k.glb --front +z --axis height \
-        --size 0.8 --lods 2500,1000 --collider box
+    ./lab addon run game-ready figure --input model=output/animate/<run>/<name>_rigged.glb \
+        --input height=1.8 --input triangles=14000 --input atlas=1024 --input bones=unity \
+        --input fingers=keep --input glow=none
+    ./lab addon run game-ready prop --input model=output/finish/<run>/<name>_5k.glb --input front=+z \
+        --input axis=height --input size=0.8 --input lods=2500,1000 --input collider=box
 
 The entry is tested without Blender: `python -m pytest tests`. The scripts in `scripts/` come from the branch
 [`feat/game-ready`](https://github.com/Ahnyth/image-to-3dlab/tree/feat/game-ready) of my AssetFurnace fork, where
