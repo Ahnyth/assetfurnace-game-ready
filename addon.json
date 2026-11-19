@@ -1,0 +1,184 @@
+{
+  "schema": 1,
+  "id": "game-ready",
+  "name": "Game-ready",
+  "version": "0.1.0",
+  "author": {
+    "name": "Ahnyth",
+    "url": "https://github.com/Ahnyth"
+  },
+  "licence": "Apache-2.0",
+  "summary": "Takes a rigged figure or a finished prop to game-ready in one step: one atlas, real size, engine bone names, the hidden inner wall dropped and checked in motion, LODs and a collider for props.",
+  "runs": "local",
+  "needs": {
+    "assetfurnace": ">=0.6.0",
+    "blender": ">=4.2"
+  },
+  "models": [],
+  "tools": [
+    {
+      "id": "figure",
+      "label": "Make a figure game-ready",
+      "hint": "Give it the GLB from Rig (or Animate): it writes one GLB with one atlas, real height, Unity or Mixamo bone names, at most four bones per vertex, the hidden inner wall dropped, and a colour check.",
+      "inputs": [
+        {
+          "id": "model",
+          "type": "model",
+          "label": "Rigged figure (GLB from Rig)"
+        },
+        {
+          "id": "height",
+          "type": "number",
+          "label": "Height (m)",
+          "min": 0.3,
+          "max": 4.0
+        },
+        {
+          "id": "triangles",
+          "type": "choice",
+          "label": "Triangles",
+          "choices": [
+            "14000",
+            "8000",
+            "20000",
+            "30000",
+            "as rigged"
+          ]
+        },
+        {
+          "id": "atlas",
+          "type": "choice",
+          "label": "Atlas size (px)",
+          "choices": [
+            "1024",
+            "2048",
+            "512"
+          ]
+        },
+        {
+          "id": "bones",
+          "type": "choice",
+          "label": "Bone names",
+          "choices": [
+            "unity",
+            "mixamo",
+            "keep"
+          ]
+        },
+        {
+          "id": "fingers",
+          "type": "choice",
+          "label": "Finger bones",
+          "choices": [
+            "keep",
+            "merge"
+          ]
+        },
+        {
+          "id": "glow",
+          "type": "text",
+          "label": "Glow colours (none, or e.g. #29e6ff)"
+        }
+      ],
+      "run": [
+        "{blender}",
+        "--background",
+        "--factory-startup",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "addon_run.py",
+        "--",
+        "{out}",
+        "figure",
+        "{model}",
+        "{height}",
+        "{triangles}",
+        "{atlas}",
+        "{bones}",
+        "{fingers}",
+        "{glow}"
+      ],
+      "makes": "glb"
+    },
+    {
+      "id": "prop",
+      "label": "Make a prop game-ready",
+      "hint": "Give it a finished prop (Finish's GLB): it turns the front to +Z, scales it to its real size, puts the pivot on the floor and writes LODs and a collider beside it.",
+      "inputs": [
+        {
+          "id": "model",
+          "type": "model",
+          "label": "Finished prop (GLB from Finish)"
+        },
+        {
+          "id": "front",
+          "type": "choice",
+          "label": "Where its front points now",
+          "choices": [
+            "+z",
+            "-z",
+            "+x",
+            "-x"
+          ]
+        },
+        {
+          "id": "axis",
+          "type": "choice",
+          "label": "Real size given as",
+          "choices": [
+            "height",
+            "length",
+            "width"
+          ]
+        },
+        {
+          "id": "size",
+          "type": "number",
+          "label": "Real size (m)",
+          "min": 0.05,
+          "max": 60.0
+        },
+        {
+          "id": "lods",
+          "type": "choice",
+          "label": "LOD faces after LOD0",
+          "choices": [
+            "2500,1000",
+            "1200,500",
+            "5000,2500,1000"
+          ]
+        },
+        {
+          "id": "collider",
+          "type": "choice",
+          "label": "Collider",
+          "choices": [
+            "box",
+            "hull",
+            "none"
+          ]
+        }
+      ],
+      "run": [
+        "{blender}",
+        "--background",
+        "--factory-startup",
+        "--python-exit-code",
+        "1",
+        "--python",
+        "addon_run.py",
+        "--",
+        "{out}",
+        "prop",
+        "{model}",
+        "{front}",
+        "{axis}",
+        "{size}",
+        "{lods}",
+        "{collider}"
+      ],
+      "makes": "glb"
+    }
+  ]
+}
