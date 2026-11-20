@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "game-ready",
   "name": "Game-ready",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "author": {
     "name": "Ahnyth",
     "url": "https://github.com/Ahnyth"
@@ -42,6 +42,7 @@
             "8000",
             "20000",
             "30000",
+            "50000",
             "as rigged"
           ]
         },
@@ -52,7 +53,8 @@
           "choices": [
             "1024",
             "2048",
-            "512"
+            "512",
+            "4096"
           ]
         },
         {

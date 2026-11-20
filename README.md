@@ -9,9 +9,12 @@ takes as it is comes out.
 
 Give it the GLB from Rig (or Animate). It writes one GLB with:
 
-- **one material and one atlas** (512 to 2048 px), where no texel is painted twice, the colour baked from the
-  figure's own textures, the normal map's detail kept as soft light from above, so no normal map is needed;
-- **the triangle count you pick** (8,000 to 30,000, or as rigged), with the **hidden inner wall dropped** first:
+- **one material and one atlas** (512 to 4096 px), where no texel is painted twice, the colour baked from the
+  figure's own textures, the normal map's detail kept as soft light from above, so no normal map is needed; the
+  **face gets as much of the atlas as its paint holds** (up to four times the body's texels across), never more;
+- **the triangle count you pick** (8,000 to 30,000 for phones, 50,000 with a 4096 atlas for a PC game: above that a
+  figure's shape stops gaining, since the generator's own detail is the limit; or as rigged), with the **hidden inner
+  wall dropped** first:
   Pixal3D leaves a second surface inside a figure that nobody sees, and dropping it gives the budget to what is
   seen. The drop is **checked in motion**: the figure is posed in a run, a dodge, a fall and a reach and seen from
   twelve sides, and any dropped face that would show as a hole is put back;

@@ -26,8 +26,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 
-TRIANGLES = ("14000", "8000", "20000", "30000", "as rigged")
-ATLAS = ("1024", "2048", "512")
+TRIANGLES = ("14000", "8000", "20000", "30000", "50000", "as rigged")  # 50000 with 4096: a PC figure (D225)
+ATLAS = ("1024", "2048", "512", "4096")
 BONES = ("unity", "mixamo", "keep")
 FINGERS = ("keep", "merge")
 FRONT = ("+z", "-z", "+x", "-x")

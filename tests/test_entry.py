@@ -37,6 +37,21 @@ def test_figure_options():
     assert "--glow" not in argv
 
 
+def test_figure_pc_choices():
+    # a PC figure (AssetFurnace Support D225): about 50k triangles and a 4096 map; above that the shape stops gaining
+    argv = addon_run.plan(figure_args(triangles="50000", atlas="4096")).argv
+    assert argv[argv.index("--decimate-to") + 1] == "50000"
+    assert argv[argv.index("--atlas") + 1] == "4096"
+
+
+def test_the_manifest_offers_what_the_runner_takes():
+    import json
+    tools = json.loads((HERE / "addon.json").read_text(encoding="utf-8"))["tools"]
+    inputs = {i["id"]: i for t in tools for i in t.get("inputs", []) if i.get("type") == "choice"}
+    assert tuple(inputs["triangles"]["choices"]) == addon_run.TRIANGLES
+    assert tuple(inputs["atlas"]["choices"]) == addon_run.ATLAS
+
+
 def test_figure_as_rigged_keeps_every_triangle():
     argv = addon_run.plan(figure_args(triangles="as rigged")).argv
     assert "--decimate-to" not in argv
