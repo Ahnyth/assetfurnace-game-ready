@@ -1536,6 +1536,8 @@ def bake_atlas(ob, s: dict, work: Path, name: str, head: list[str] | None = None
         nt.links.new(nmap.outputs["Normal"], bsdf.inputs["Normal"])
     bsdf.inputs["Roughness"].default_value = s["roughness"]
     bsdf.inputs["Metallic"].default_value = 0.0
+    # --look: how much of a bright room the surface mirrors; exported as KHR_materials_specular when not 0.5
+    bsdf.inputs["Specular IOR Level"].default_value = s.get("specular", 0.5)
     mat.use_backface_culling = True
     me.materials.append(mat)
     stats["bake_device"] = device
@@ -1639,6 +1641,7 @@ def main() -> None:
         report.update(decimate_with_head(ob, s, head))
     colour_objs = import_colour_model(s["colour_from"], T, feet) if s.get("colour_from") else None
     report.update(new_uvs(ob, s, head, colour_objs, arm))
+    s["body_texels_per_cm"] = report.get("body_texels_per_cm") or None  # the glow gate's widths in centimetres
     normal_objs = None
     if s.get("normal_from"):
         same = colour_objs and Path(s["normal_from"]).resolve() == Path(s["colour_from"]).resolve()

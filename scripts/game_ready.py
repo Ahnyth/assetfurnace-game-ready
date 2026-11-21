@@ -127,12 +127,23 @@ FIXED = {
     "glow_paint_gap": 0.30,           # ... and this much brighter than the rest is mostly paint: only the bright
                                       # group glows (the Purpur-Samurai's crimson plates: 20 %, 0.42; 25 figures
                                       # measured, four such, D207)
+    "glow_ref_texels_per_cm": 2.15,   # --glow-max-width counts texels at 1024 for a body of this many texels per cm
+                                      # (scaled to a 1024 atlas); a body packed denser or looser has its widths
+                                      # scaled to match, so a line keeps its width in centimetres however much of the
+                                      # atlas the face takes. 2.15-2.2 keeps all 39 glow hues of the 22 glowing
+                                      # ArcherSoul figures as they were (2.05 and 2.25 flip one each; D232)
     "face_half_width": 0.034,  # --head-zone face (the default): the faces on the head bones that face the front
     "face_below": 0.02,        # (normal toward -Y at least `face_facing`), lie within this share of the height of
     "face_above": 0.06,        # the head bone sideways and from this far below its joint to this far above it: the
     "face_facing": 0.5,        # face from the chin to the brows; a hat's front, the hair and the ears lie outside
                                # (five figures measured, D230 of the AssetFurnace Support notes)
 }
+
+# --look: how much of a bright room every surface mirrors (the glTF Specular IOR Level, exported as
+# KHR_materials_specular; 0.5 is the default 4 %). Measured on the Revolverheld and the Zauberer (AssetFurnace Support
+# D232): under a bright room the default sheen lays a grey veil over dark cloth (the darkest tones 7 -> 29 of 255,
+# half the saturation), a fifth of it keeps the picture's blacks and colour.
+LOOKS = {"stylized": 0.5, "clean": 0.1}
 
 # --drop-hidden thins to this many times the budget first: the Wachter, thinned to 22,000, kept 15,275 after the
 # drop (D190 of the AssetFurnace Support notes); each figure's next try is aimed by what its own drop left.
@@ -268,6 +279,10 @@ def add_options(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--max-influences", type=_influences, default=4, help="bones per vertex (default 4)")
     parser.add_argument("--smooth", type=int, default=2, help="weight smoothing passes (default 2)")
     parser.add_argument("--roughness", type=_fraction, default=0.8, help="material roughness (default 0.8)")
+    parser.add_argument("--look", choices=tuple(LOOKS), default="stylized",
+                        help="stylized (default): the usual material, every surface mirrors a little of a bright "
+                             "room; clean: a fifth of that sheen, so dark cloth stays dark and colours stay "
+                             "full")
     parser.add_argument("--decimate-to", type=_triangles, default=0, metavar="N",
                         help="thin the mesh to about N triangles first (default 0, keep); rig a finer Finish "
                              "(say 40k) and thin it here, so --head-protect can keep the face")
@@ -340,7 +355,7 @@ def _to_settings(ns: argparse.Namespace) -> dict:
              glow_strength=ns.glow_strength, glow_grow=ns.glow_width, glow_max_width=ns.glow_max_width,
              glow_not_on_head=ns.glow_not_on_head, glow_not_on_hands=ns.glow_not_on_hands,
              shade=not ns.no_shade, fingers=ns.fingers, style=ns.style, max_influences=ns.max_influences,
-             smooth_iters=max(0, ns.smooth), roughness=ns.roughness,
+             smooth_iters=max(0, ns.smooth), roughness=ns.roughness, look=ns.look, specular=LOOKS[ns.look],
              decimate_to=ns.decimate_to, head_protect=ns.head_protect, head_texel=ns.head_texel,
              head_zone=ns.head_zone, game_texture=ns.game_texture,
              colour_from=str(ns.colour_from) if ns.colour_from else None,
@@ -571,11 +586,15 @@ def compose(alb_lin, lit, cov, s: dict, exclude=None):
     inside = cov > 0
     a_s = to_srgb(alb_lin)
     scale = s["atlas"] / 1024  # widths are given in texels at 1024
+    # which lines are thin enough to glow is judged in centimetres: by the body's own density when it was measured
+    # (a grown face packs the body denser; counted in texels, the gate flipped, D231 of the AssetFurnace Support notes)
+    body = s.get("body_texels_per_cm")
+    thin_scale = body / s["glow_ref_texels_per_cm"] if body else scale
     keep = 1.0 if exclude is None else 1.0 - smoothstep(0.2, 0.5, exclude)
     masks, splits = [], {}
     for c in s["glow"]:
         # split only what would glow: the thin lines left after the wide parts (a face, a plate) and the head are out
-        m, split = glow_only_bright(thin_only(accent_mask(a_s, c) * inside, s["glow_max_width"] * scale) * keep,
+        m, split = glow_only_bright(thin_only(accent_mask(a_s, c) * inside, s["glow_max_width"] * thin_scale) * keep,
                                     a_s, inside, s)
         if split is not None:
             splits["#" + "".join(f"{round(x * 255):02x}" for x in c)] = split
@@ -1263,7 +1282,8 @@ def atlas_density(co, uv, vert_tris, uv_tris, atlas: int, grid_max: int = 2048) 
     """How well the atlas is spent, measured honestly.
 
     `texels_per_cm`: the atlas's texels per centimetre of surface, over the whole figure (positions `co` in metres,
-    triangles `vert_tris`; UVs `uv` per corner, triangles `uv_tris`). `atlas_covered`: the share of the atlas's
+    triangles `vert_tris`; UVs `uv` per corner, triangles `uv_tris`). `body_texels_per_cm`: the density of the bulk of
+    the surface (the area-weighted median over the triangles), which a grown face does not move. `atlas_covered`: the share of the atlas's
     texels some triangle paints, and `texels_twice`: the share of those that two or more triangles paint, both on a
     grid of the atlas's size (at most `grid_max`). A summed UV area would count a folded island twice: the Wachter's
     atlas looked 55 % and then 68 % used while 1.2 % of its texels were painted twice (#146).
@@ -1271,12 +1291,21 @@ def atlas_density(co, uv, vert_tris, uv_tris, atlas: int, grid_max: int = 2048) 
     co, uv = np.asarray(co, float), np.asarray(uv, float)
     vert_tris, uv_tris = np.asarray(vert_tris, int).reshape(-1, 3), np.asarray(uv_tris, int).reshape(-1, 3)
     if not len(vert_tris):
-        return {"texels_per_cm": 0.0, "atlas_covered": 0.0, "texels_twice": 0.0}
+        return {"texels_per_cm": 0.0, "body_texels_per_cm": 0.0, "atlas_covered": 0.0, "texels_twice": 0.0}
     p = co[vert_tris]
-    surface_cm2 = float(np.linalg.norm(np.cross(p[:, 1] - p[:, 0], p[:, 2] - p[:, 0]), axis=1).sum() / 2) * 1e4
+    tri_cm2 = np.linalg.norm(np.cross(p[:, 1] - p[:, 0], p[:, 2] - p[:, 0]), axis=1) / 2 * 1e4
+    surface_cm2 = float(tri_cm2.sum())
     t = uv[uv_tris]
     cross = (t[:, 1, 0] - t[:, 0, 0]) * (t[:, 2, 1] - t[:, 0, 1]) - (t[:, 1, 1] - t[:, 0, 1]) * (t[:, 2, 0] - t[:, 0, 0])
-    uv_texels = float(np.abs(cross).sum() / 2) * atlas * atlas
+    tri_texels = np.abs(cross) / 2 * atlas * atlas
+    uv_texels = float(tri_texels.sum())
+    body = 0.0
+    real = tri_cm2 > 1e-9
+    if real.any():
+        dens = np.sqrt(tri_texels[real] / tri_cm2[real])
+        order = np.argsort(dens)
+        weight = np.cumsum(tri_cm2[real][order])
+        body = float(dens[order][np.searchsorted(weight, weight[-1] / 2)])
     n = min(int(atlas), grid_max)
     count = np.zeros(n * n, np.int32)
     px = t * n
@@ -1295,6 +1324,7 @@ def atlas_density(co, uv, vert_tris, uv_tris, atlas: int, grid_max: int = 2048) 
         count[(gy[inside].astype(int) * n + gx[inside].astype(int))] += 1
     covered = count > 0
     return {"texels_per_cm": round((uv_texels / surface_cm2) ** 0.5, 3) if surface_cm2 > 0 else 0.0,
+            "body_texels_per_cm": round(body, 3),
             "atlas_covered": round(float(covered.mean()), 4),
             "texels_twice": round(float((count[covered] > 1).mean()), 4) if covered.any() else 0.0}
 

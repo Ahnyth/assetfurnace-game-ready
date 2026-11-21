@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "game-ready",
   "name": "Game-ready",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "author": {
     "name": "Ahnyth",
     "url": "https://github.com/Ahnyth"
@@ -80,6 +80,15 @@
           "id": "glow",
           "type": "text",
           "label": "Glow colours (none, or e.g. #29e6ff)"
+        },
+        {
+          "id": "look",
+          "type": "choice",
+          "label": "Look",
+          "choices": [
+            "stylized",
+            "clean"
+          ]
         }
       ],
       "run": [
@@ -99,7 +108,8 @@
         "{atlas}",
         "{bones}",
         "{fingers}",
-        "{glow}"
+        "{glow}",
+        "{look}"
       ],
       "makes": "glb"
     },

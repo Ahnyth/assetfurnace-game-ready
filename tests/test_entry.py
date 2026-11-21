@@ -15,8 +15,9 @@ def figure_args(**over):
     args = {"out": "/o/run-1", "model": "/m/hero_rigged.glb", "height": "1.8", "triangles": "14000",
             "atlas": "1024", "bones": "unity", "fingers": "keep", "glow": "none"}
     args.update(over)
-    return ["blender", "-b", "--python", "addon_run.py", "--", args["out"], "figure", args["model"], args["height"],
-            args["triangles"], args["atlas"], args["bones"], args["fingers"], args["glow"]]
+    run = ["blender", "-b", "--python", "addon_run.py", "--", args["out"], "figure", args["model"], args["height"],
+           args["triangles"], args["atlas"], args["bones"], args["fingers"], args["glow"]]
+    return run + [args["look"]] if "look" in args else run
 
 
 def test_figure_writes_the_glb_the_studio_looks_for():
@@ -50,6 +51,24 @@ def test_the_manifest_offers_what_the_runner_takes():
     inputs = {i["id"]: i for t in tools for i in t.get("inputs", []) if i.get("type") == "choice"}
     assert tuple(inputs["triangles"]["choices"]) == addon_run.TRIANGLES
     assert tuple(inputs["atlas"]["choices"]) == addon_run.ATLAS
+
+
+def test_figure_look():
+    # clean (AssetFurnace Support D232/D233): a fifth of the default sheen, no grey veil over dark cloth
+    argv = addon_run.plan(figure_args(look="clean")).argv
+    assert argv[argv.index("--look") + 1] == "clean"
+    assert "--look" not in addon_run.plan(figure_args(look="stylized")).argv
+    assert "--look" not in addon_run.plan(figure_args()).argv  # a studio passing the eight inputs of 0.1.5
+    with pytest.raises(SystemExit):
+        addon_run.plan(figure_args(look="shiny"))
+
+
+def test_the_manifest_offers_the_looks_the_runner_takes():
+    import json
+    tool = json.loads((HERE / "addon.json").read_text(encoding="utf-8"))["tools"][0]
+    inputs = {i["id"]: i for i in tool["inputs"]}
+    assert tuple(inputs["look"]["choices"]) == addon_run.LOOK
+    assert tool["run"][-1] == "{look}"
 
 
 def test_figure_as_rigged_keeps_every_triangle():

@@ -30,6 +30,7 @@ TRIANGLES = ("14000", "8000", "20000", "30000", "50000", "as rigged")  # 50000 w
 ATLAS = ("1024", "2048", "512", "4096")
 BONES = ("unity", "mixamo", "keep")
 FINGERS = ("keep", "merge")
+LOOK = ("stylized", "clean")  # clean: a fifth of the default sheen (game_ready.py --look)
 FRONT = ("+z", "-z", "+x", "-x")
 AXIS = ("height", "length", "width")
 LODS = ("2500,1000", "1200,500", "5000,2500,1000")
@@ -85,9 +86,11 @@ def plan(argv: Sequence[str]) -> Job:
     stem = out_dir.name
     result = out_dir / f"{stem}.glb"
     if tool == "figure":
-        if len(args) != 9:
-            raise SystemExit("usage: addon_run.py -- OUT_DIR figure MODEL HEIGHT TRIANGLES ATLAS BONES FINGERS GLOW")
-        model, height, triangles, atlas, bones, fingers, glow = args[2:]
+        if len(args) not in (9, 10):
+            raise SystemExit("usage: addon_run.py -- OUT_DIR figure MODEL HEIGHT TRIANGLES ATLAS BONES FINGERS GLOW "
+                             "[LOOK]")
+        model, height, triangles, atlas, bones, fingers, glow = args[2:9]
+        look = _pick("look", args[9], LOOK) if len(args) == 10 else "stylized"
         cmd = [str(Path(model)), str(result), "--height", _number("height", height),
                "--atlas", _pick("atlas", atlas, ATLAS), "--style", _pick("bones", bones, BONES),
                "--fingers", _pick("fingers", fingers, FINGERS)]
@@ -98,6 +101,8 @@ def plan(argv: Sequence[str]) -> Job:
             cmd += ["--glow", colour]
         if colours:  # a glowing face or glowing hands read as a fault on a figure
             cmd += ["--glow-not-on-head", "--glow-not-on-hands"]
+        if look != "stylized":
+            cmd += ["--look", look]
         return Job("figure", cmd, result)
     if len(args) != 8:
         raise SystemExit("usage: addon_run.py -- OUT_DIR prop MODEL FRONT AXIS SIZE LODS COLLIDER")
