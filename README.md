@@ -27,9 +27,9 @@ Give it the GLB from Rig (or Animate). It writes one GLB with:
   at most four bones per vertex;
 - optional **glow** on thin lines of the colours you name (`#29e6ff`), never on the face or the hands; what counts as
   a thin line is judged in centimetres, so a figure glows the same however much of the atlas its face takes;
-- a **look**: `stylized` (the usual material) or `clean`, which mirrors a fifth of a bright room's light, so a dark
-  coat stays dark and colours stay full in engines and viewers that light with a bright environment (the default
-  sheen lifted a figure's darkest tones from 7 to 29 of 255 and halved its colour);
+- a **look**: `clean` (the default since 0.1.7), which mirrors a fifth of a bright room's light, so a dark coat stays
+  dark and colours stay full in engines and viewers that light with a bright environment, or `stylized`, the usual
+  material, whose sheen lifted a figure's darkest tones from 7 to 29 of 255 and halved its colour;
 - a **colour check** at the end: the finished figure against the model its colour came from, from eight sides; a
   patch that differs is a bake fault, named in `<run>.report.json` and marked in `<run>.colour.png`.
 
@@ -56,7 +56,7 @@ In the studio: Add-ons, Game-ready. From the command line:
     ./lab addon add --unlisted https://github.com/Ahnyth/assetfurnace-game-ready@<commit>
     ./lab addon run game-ready figure --input model=output/animate/<run>/<name>_rigged.glb \
         --input height=1.8 --input triangles=14000 --input atlas=1024 --input bones=unity \
-        --input fingers=keep --input glow=none --input look=stylized
+        --input fingers=keep --input glow=none --input look=clean
     ./lab addon run game-ready prop --input model=output/finish/<run>/<name>_5k.glb --input front=+z \
         --input axis=height --input size=0.8 --input lods=2500,1000 --input collider=box
 

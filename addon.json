@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "game-ready",
   "name": "Game-ready",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "author": {
     "name": "Ahnyth",
     "url": "https://github.com/Ahnyth"
@@ -86,8 +86,8 @@
           "type": "choice",
           "label": "Look",
           "choices": [
-            "stylized",
-            "clean"
+            "clean",
+            "stylized"
           ]
         }
       ],

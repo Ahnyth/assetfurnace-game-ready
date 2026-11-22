@@ -55,10 +55,13 @@ def test_the_manifest_offers_what_the_runner_takes():
 
 def test_figure_look():
     # clean (AssetFurnace Support D232/D233): a fifth of the default sheen, no grey veil over dark cloth
-    argv = addon_run.plan(figure_args(look="clean")).argv
-    assert argv[argv.index("--look") + 1] == "clean"
-    assert "--look" not in addon_run.plan(figure_args(look="stylized")).argv
-    assert "--look" not in addon_run.plan(figure_args()).argv  # a studio passing the eight inputs of 0.1.5
+    # clean is the default since 0.1.7 (AssetFurnace Support #212 (a), D246): blacks stay black for whoever picks nothing
+    def look_of(argv):
+        return argv[argv.index("--look") + 1]
+
+    assert look_of(addon_run.plan(figure_args(look="clean")).argv) == "clean"
+    assert look_of(addon_run.plan(figure_args(look="stylized")).argv) == "stylized"
+    assert look_of(addon_run.plan(figure_args()).argv) == "clean"  # a studio passing the eight inputs of 0.1.5
     with pytest.raises(SystemExit):
         addon_run.plan(figure_args(look="shiny"))
 
@@ -68,6 +71,7 @@ def test_the_manifest_offers_the_looks_the_runner_takes():
     tool = json.loads((HERE / "addon.json").read_text(encoding="utf-8"))["tools"][0]
     inputs = {i["id"]: i for i in tool["inputs"]}
     assert tuple(inputs["look"]["choices"]) == addon_run.LOOK
+    assert inputs["look"]["choices"][0] == "clean"  # the studio shows the first choice as the default
     assert tool["run"][-1] == "{look}"
 
 
