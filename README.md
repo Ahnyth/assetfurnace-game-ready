@@ -31,6 +31,9 @@ Give it the GLB from Rig (or Animate). It writes one GLB with:
 - a **look**: `clean` (the default since 0.1.7), which mirrors a fifth of a bright room's light, so a dark coat stays
   dark and colours stay full in engines and viewers that light with a bright environment, or `stylized`, the usual
   material, whose sheen lifted a figure's darkest tones from 7 to 29 of 255 and halved its colour;
+- the colour **baked from the finer model** it names, never from the back of a surface (since 0.1.9: round a neck in a
+  high collar the rays started behind the collar's inside and painted its dark under the chin; each texel now takes
+  the longest of three ray starts that meets a surface facing it, or keeps its own paint);
 - a **colour check** at the end: the finished figure against the model its colour came from, from eight sides; a
   patch that differs is a bake fault, named in `<run>.report.json` and marked in `<run>.colour.png`.
 
