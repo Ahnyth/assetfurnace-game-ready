@@ -18,7 +18,8 @@ Give it the GLB from Rig (or Animate). It writes one GLB with:
   wall dropped** first:
   Pixal3D leaves a second surface inside a figure that nobody sees, and dropping it gives the budget to what is
   seen. The drop is **checked in motion**: the figure is posed in a run, a dodge, a fall and a reach and seen from
-  twelve sides, and any dropped face that would show as a hole is put back;
+  twelve sides, and any dropped face that would show as a hole is put back; an edge that can be seen from outside
+  is never opened (since 0.1.8: where hair goes up into a hat's brim, the brim's underside stays closed);
 - **real height** with the feet on the floor; a **sole the generator made up** below the pictures' feet (it finds
   the Finish run in the rig's licence record) is cut off, and thin plates of it the cut leaves in front of the toe
   (under 6.5 mm on a 1.85 m figure) are cleared and the toe closed, while the boot's own toe stays (a heel only a
