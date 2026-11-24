@@ -55,6 +55,15 @@ def _pick(name: str, value: str, choices: Sequence[str]) -> str:
     return value
 
 
+def _toggle(name: str, value: str) -> bool:
+    lowered = value.strip().lower()
+    if lowered in ("true", "1", "yes"):
+        return True
+    if lowered in ("false", "0", "no"):
+        return False
+    raise SystemExit(f"{name}: {value!r} is not true or false")
+
+
 def _number(name: str, value: str) -> str:
     try:
         number = float(value)
@@ -87,12 +96,13 @@ def plan(argv: Sequence[str]) -> Job:
     stem = out_dir.name
     result = out_dir / f"{stem}.glb"
     if tool == "figure":
-        if len(args) not in (9, 10, 11):
+        if len(args) not in (9, 10, 11, 12):
             raise SystemExit("usage: addon_run.py -- OUT_DIR figure MODEL HEIGHT TRIANGLES ATLAS BONES FINGERS GLOW "
-                             "[LOOK [GLOW_WHERE]]")
+                             "[LOOK [GLOW_WHERE [LARGE_GLOW]]]")
         model, height, triangles, atlas, bones, fingers, glow = args[2:9]
         look = _pick("look", args[9], LOOK) if len(args) >= 10 else LOOK[0]
-        where = _pick("glow where", args[10], GLOW_WHERE) if len(args) == 11 else GLOW_WHERE[0]
+        where = _pick("glow where", args[10], GLOW_WHERE) if len(args) >= 11 else GLOW_WHERE[0]
+        large = _toggle("let large areas glow", args[11]) if len(args) == 12 else False
         cmd = [str(Path(model)), str(result), "--height", _number("height", height),
                "--atlas", _pick("atlas", atlas, ATLAS), "--style", _pick("bones", bones, BONES),
                "--fingers", _pick("fingers", fingers, FINGERS)]
@@ -103,8 +113,11 @@ def plan(argv: Sequence[str]) -> Job:
             cmd += ["--glow", colour]
         if colours and where == "eyes only":  # the eyes' colour is on the body too: the head alone glows
             cmd += ["--glow-only-on-head"]
-        elif colours:  # a glowing face or glowing hands read as a fault on a figure
-            cmd += ["--glow-not-on-head", "--glow-not-on-hands"]
+        elif colours:  # a glowing face or glowing hands read as a fault on a figure; past the 8 % cap, when the
+            # eyes carry the colour (a knight's red eye slit over red trims), the eyes alone glow
+            cmd += ["--glow-not-on-head", "--glow-not-on-hands", "--glow-where", "auto"]
+        if colours and large:  # a figure meant to glow wide (runes all over, a lava golem): no cap
+            cmd += ["--glow-max-area", "1"]
         cmd += ["--look", look]  # always named: game_ready.py itself still defaults to stylized
         return Job("figure", cmd, result)
     if len(args) != 8:

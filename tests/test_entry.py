@@ -1,5 +1,6 @@
 """The add-on's entry: what it hands the scripts, and where it finds AssetFurnace's own Python."""
 
+import json
 import sys
 from pathlib import Path
 
@@ -72,7 +73,7 @@ def test_the_manifest_offers_the_looks_the_runner_takes():
     inputs = {i["id"]: i for i in tool["inputs"]}
     assert tuple(inputs["look"]["choices"]) == addon_run.LOOK
     assert inputs["look"]["choices"][0] == "clean"  # the studio shows the first choice as the default
-    assert tool["run"][-2:] == ["{look}", "{glow_where}"]
+    assert tool["run"][-3:] == ["{look}", "{glow_where}", "{large_glow}"]
     assert tuple(inputs["glow_where"]["choices"]) == addon_run.GLOW_WHERE  # the first, body lines, is the default
 
 
@@ -197,3 +198,30 @@ def test_glow_on_the_body_lines_or_on_the_eyes_alone():
     assert "--glow" not in addon_run.plan(figure_args(look="clean") + ["eyes only"]).argv
     with pytest.raises(SystemExit):
         addon_run.plan(figure_args(glow="#da294c", look="clean") + ["the left knee"])
+
+
+def test_body_lines_let_the_eyes_alone_glow_when_the_glow_would_cover_too_much():
+    # body lines keep the face and the hands dark; past game_ready's 8 % cap, when the eyes carry the colour, the eyes
+    # alone glow (game_ready's --glow-where auto, AssetFurnace Support TODO 198)
+    argv = addon_run.plan(figure_args(glow="#da294c", look="clean") + ["body lines"]).argv
+    assert argv[argv.index("--glow-where") + 1] == "auto" and "--glow-not-on-head" in argv
+    assert "--glow-max-area" not in argv
+    assert "--glow-where" not in addon_run.plan(figure_args(look="clean") + ["body lines"]).argv   # nothing glows
+
+
+def test_large_areas_may_glow_when_ticked():
+    argv = addon_run.plan(figure_args(glow="#ff6a00", look="clean") + ["body lines", "True"]).argv
+    assert argv[argv.index("--glow-max-area") + 1] == "1"
+    argv = addon_run.plan(figure_args(glow="#ff6a00", look="clean") + ["eyes only", "true"]).argv
+    assert argv[argv.index("--glow-max-area") + 1] == "1" and "--glow-only-on-head" in argv
+    assert "--glow-max-area" not in addon_run.plan(figure_args(glow="#ff6a00", look="clean")
+                                                   + ["body lines", "False"]).argv
+    with pytest.raises(SystemExit):
+        addon_run.plan(figure_args(glow="#ff6a00", look="clean") + ["body lines", "maybe"])
+
+
+def test_the_manifest_offers_the_large_glow_box():
+    manifest = json.loads((Path(addon_run.__file__).parent / "addon.json").read_text(encoding="utf-8"))
+    figure = next(t for t in manifest["tools"] if t["id"] == "figure")
+    box = next(i for i in figure["inputs"] if i["id"] == "large_glow")
+    assert box["type"] == "toggle" and figure["run"][-1] == "{large_glow}"

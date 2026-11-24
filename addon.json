@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "game-ready",
   "name": "Game-ready",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "author": {
     "name": "Ahnyth",
     "url": "https://github.com/Ahnyth"
@@ -98,6 +98,11 @@
             "body lines",
             "eyes only"
           ]
+        },
+        {
+          "id": "large_glow",
+          "type": "toggle",
+          "label": "Let large areas glow (no 8 % cap)"
         }
       ],
       "run": [
@@ -119,7 +124,8 @@
         "{fingers}",
         "{glow}",
         "{look}",
-        "{glow_where}"
+        "{glow_where}",
+        "{large_glow}"
       ],
       "makes": "glb"
     },
