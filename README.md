@@ -33,7 +33,10 @@ Give it the GLB from Rig (or Animate). It writes one GLB with:
   material, whose sheen lifted a figure's darkest tones from 7 to 29 of 255 and halved its colour;
 - the colour **baked from the finer model** it names, never from the back of a surface (since 0.1.9: round a neck in a
   high collar the rays started behind the collar's inside and painted its dark under the chin; each texel now takes
-  the longest of three ray starts that meets a surface facing it, or keeps its own paint);
+  the longest of three ray starts that meets a surface facing it, or keeps its own paint), nor from another layer
+  standing off it (since 0.1.10: a collar's flap a centimetre out lay inside the longest start and drew thin dark
+  strokes along a wizard's jaw; where the longest ray's paint is far from the figure's own, a shorter start that
+  agrees with it wins);
 - a **colour check** at the end: the finished figure against the model its colour came from, from eight sides; a
   patch that differs is a bake fault, named in `<run>.report.json` and marked in `<run>.colour.png`.
 
@@ -41,7 +44,7 @@ Give it the GLB from Rig (or Animate). It writes one GLB with:
 
 Give it a finished prop (Finish's GLB). It turns its front to +Z (glTF's and Unity's forward), scales it to its real
 height, length or width, puts the pivot at the bottom centre, and writes LODs (each baked from LOD0, maps
-compressed) and a box or convex-hull collider beside it, with `<run>.prop.json` saying what it did. The result is
+compressed) and a box or convex-hull collider beside it (the hull built on Blender 5.2 again since 0.1.10), with `<run>.prop.json` saying what it did. The result is
 LOD0.
 
 ## What it does on your machine
