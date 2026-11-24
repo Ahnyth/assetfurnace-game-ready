@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "game-ready",
   "name": "Game-ready",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "author": {
     "name": "Ahnyth",
     "url": "https://github.com/Ahnyth"
@@ -96,7 +96,8 @@
           "label": "Glow where",
           "choices": [
             "body lines",
-            "eyes only"
+            "eyes only",
+            "body and head"
           ]
         },
         {

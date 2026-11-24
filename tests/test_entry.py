@@ -209,6 +209,17 @@ def test_body_lines_let_the_eyes_alone_glow_when_the_glow_would_cover_too_much()
     assert "--glow-where" not in addon_run.plan(figure_args(look="clean") + ["body lines"]).argv   # nothing glows
 
 
+def test_body_and_head_let_a_glow_on_the_head_stay_beside_the_body_lines():
+    # a hero with a glowing circlet as well as glowing body lines (AssetFurnace Support D283): the head may glow too,
+    # the hands stay dark, and past the 8 % cap game_ready's auto still keeps glowing eyes alone
+    argv = addon_run.plan(figure_args(glow="#29e6ff", look="clean") + ["body and head"]).argv
+    assert argv[argv.index("--glow-where") + 1] == "auto" and "--glow-not-on-hands" in argv
+    assert "--glow-not-on-head" not in argv and "--glow-only-on-head" not in argv
+    argv = addon_run.plan(figure_args(glow="#29e6ff", look="clean") + ["body and head", "true"]).argv
+    assert argv[argv.index("--glow-max-area") + 1] == "1" and "--glow-not-on-head" not in argv
+    assert "--glow-where" not in addon_run.plan(figure_args(look="clean") + ["body and head"]).argv   # nothing glows
+
+
 def test_large_areas_may_glow_when_ticked():
     argv = addon_run.plan(figure_args(glow="#ff6a00", look="clean") + ["body lines", "True"]).argv
     assert argv[argv.index("--glow-max-area") + 1] == "1"

@@ -30,7 +30,8 @@ TRIANGLES = ("14000", "8000", "20000", "30000", "50000", "as rigged")  # 50000 w
 ATLAS = ("1024", "2048", "512", "4096")
 BONES = ("unity", "mixamo", "keep")
 FINGERS = ("keep", "merge")
-GLOW_WHERE = ("body lines", "eyes only")  # eyes only: the head alone glows (a red eye slit over red trims)
+GLOW_WHERE = ("body lines", "eyes only", "body and head")  # eyes only: the head alone glows (a red eye slit over red
+# trims); body and head: the head may glow beside the body (a hero's glowing circlet and his glowing lines)
 LOOK = ("clean", "stylized")  # clean (the default since 0.1.7): a fifth of the default sheen (game_ready.py --look)
 FRONT = ("+z", "-z", "+x", "-x")
 AXIS = ("height", "length", "width")
@@ -113,6 +114,9 @@ def plan(argv: Sequence[str]) -> Job:
             cmd += ["--glow", colour]
         if colours and where == "eyes only":  # the eyes' colour is on the body too: the head alone glows
             cmd += ["--glow-only-on-head"]
+        elif colours and where == "body and head":  # the head glows too, the hands stay dark; past the 8 % cap the
+            # eyes alone glow when they carry the colour, as with body lines
+            cmd += ["--glow-not-on-hands", "--glow-where", "auto"]
         elif colours:  # a glowing face or glowing hands read as a fault on a figure; past the 8 % cap, when the
             # eyes carry the colour (a knight's red eye slit over red trims), the eyes alone glow
             cmd += ["--glow-not-on-head", "--glow-not-on-hands", "--glow-where", "auto"]

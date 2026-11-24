@@ -26,14 +26,16 @@ Give it the GLB from Rig (or Animate). It writes one GLB with:
   little too high is pressed flat instead);
 - **engine bone names** (Unity's Humanoid or Mixamo, or the rig's own), finger bones kept or folded into the hands,
   at most four bones per vertex;
-- optional **glow** on thin lines of the colours you name (`#29e6ff`), never on the face or the hands; what counts as
+- optional **glow** on thin lines of the colours you name (`#29e6ff`), never on the hands, and on the face only when
+  asked (below); what counts as
   a thin line is judged in centimetres, so a figure glows the same however much of the atlas its face takes; at most
   8 % of the figure glows (since 0.1.11: a knight's eye-slit red also matched his dark red cape faintly and lit a
   quarter of him; past 8 % the glow is narrowed, and dropped if it stays past it); since 0.1.13, past 8 %, when the
   eyes carry the colour (a red eye slit over red trims), **the eyes alone glow by themselves**; **Glow where: eyes
   only** asks for the glow on the head alone in any case (only skin plainly the head's, not a neck it shares, since
-  0.1.12); **Let large areas glow** turns the 8 % cap off, for a figure meant to glow wide (runes all over, a lava
-  golem);
+  0.1.12); **Glow where: body and head** (since 0.1.14) lets the head glow beside the body lines, for a figure
+  meant to have both (a glowing circlet and glowing lines; the hands stay dark); **Let large areas glow** turns the
+  8 % cap off, for a figure meant to glow wide (runes all over, a lava golem);
 - a **look**: `clean` (the default since 0.1.7), which mirrors a fifth of a bright room's light, so a dark coat stays
   dark and colours stay full in engines and viewers that light with a bright environment, or `stylized`, the usual
   material, whose sheen lifted a figure's darkest tones from 7 to 29 of 255 and halved its colour;
