@@ -72,7 +72,8 @@ def test_the_manifest_offers_the_looks_the_runner_takes():
     inputs = {i["id"]: i for i in tool["inputs"]}
     assert tuple(inputs["look"]["choices"]) == addon_run.LOOK
     assert inputs["look"]["choices"][0] == "clean"  # the studio shows the first choice as the default
-    assert tool["run"][-1] == "{look}"
+    assert tool["run"][-2:] == ["{look}", "{glow_where}"]
+    assert tuple(inputs["glow_where"]["choices"]) == addon_run.GLOW_WHERE  # the first, body lines, is the default
 
 
 def test_figure_as_rigged_keeps_every_triangle():
@@ -184,3 +185,15 @@ def test_no_python_found(tmp_path):
     addon_dir = tmp_path / "loose" / "game-ready"
     addon_dir.mkdir(parents=True)
     assert addon_run.find_python(addon_dir, {})[0] is None
+
+
+def test_glow_on_the_body_lines_or_on_the_eyes_alone():
+    # a knight's red eye slit shares its red with his trims: "eyes only" keeps the glow on the head (AssetFurnace
+    # Support D275); body lines stay the default, never on the face or the hands
+    argv = addon_run.plan(figure_args(glow="#da294c")).argv
+    assert "--glow-not-on-head" in argv and "--glow-not-on-hands" in argv and "--glow-only-on-head" not in argv
+    argv = addon_run.plan(figure_args(glow="#da294c", look="clean") + ["eyes only"]).argv
+    assert "--glow-only-on-head" in argv and "--glow-not-on-head" not in argv
+    assert "--glow" not in addon_run.plan(figure_args(look="clean") + ["eyes only"]).argv
+    with pytest.raises(SystemExit):
+        addon_run.plan(figure_args(glow="#da294c", look="clean") + ["the left knee"])

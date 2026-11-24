@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "game-ready",
   "name": "Game-ready",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "author": {
     "name": "Ahnyth",
     "url": "https://github.com/Ahnyth"
@@ -89,6 +89,15 @@
             "clean",
             "stylized"
           ]
+        },
+        {
+          "id": "glow_where",
+          "type": "choice",
+          "label": "Glow where",
+          "choices": [
+            "body lines",
+            "eyes only"
+          ]
         }
       ],
       "run": [
@@ -109,7 +118,8 @@
         "{bones}",
         "{fingers}",
         "{glow}",
-        "{look}"
+        "{look}",
+        "{glow_where}"
       ],
       "makes": "glb"
     },

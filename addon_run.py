@@ -30,6 +30,7 @@ TRIANGLES = ("14000", "8000", "20000", "30000", "50000", "as rigged")  # 50000 w
 ATLAS = ("1024", "2048", "512", "4096")
 BONES = ("unity", "mixamo", "keep")
 FINGERS = ("keep", "merge")
+GLOW_WHERE = ("body lines", "eyes only")  # eyes only: the head alone glows (a red eye slit over red trims)
 LOOK = ("clean", "stylized")  # clean (the default since 0.1.7): a fifth of the default sheen (game_ready.py --look)
 FRONT = ("+z", "-z", "+x", "-x")
 AXIS = ("height", "length", "width")
@@ -86,11 +87,12 @@ def plan(argv: Sequence[str]) -> Job:
     stem = out_dir.name
     result = out_dir / f"{stem}.glb"
     if tool == "figure":
-        if len(args) not in (9, 10):
+        if len(args) not in (9, 10, 11):
             raise SystemExit("usage: addon_run.py -- OUT_DIR figure MODEL HEIGHT TRIANGLES ATLAS BONES FINGERS GLOW "
-                             "[LOOK]")
+                             "[LOOK [GLOW_WHERE]]")
         model, height, triangles, atlas, bones, fingers, glow = args[2:9]
-        look = _pick("look", args[9], LOOK) if len(args) == 10 else LOOK[0]
+        look = _pick("look", args[9], LOOK) if len(args) >= 10 else LOOK[0]
+        where = _pick("glow where", args[10], GLOW_WHERE) if len(args) == 11 else GLOW_WHERE[0]
         cmd = [str(Path(model)), str(result), "--height", _number("height", height),
                "--atlas", _pick("atlas", atlas, ATLAS), "--style", _pick("bones", bones, BONES),
                "--fingers", _pick("fingers", fingers, FINGERS)]
@@ -99,7 +101,9 @@ def plan(argv: Sequence[str]) -> Job:
         colours = glow_colours(glow)
         for colour in colours:
             cmd += ["--glow", colour]
-        if colours:  # a glowing face or glowing hands read as a fault on a figure
+        if colours and where == "eyes only":  # the eyes' colour is on the body too: the head alone glows
+            cmd += ["--glow-only-on-head"]
+        elif colours:  # a glowing face or glowing hands read as a fault on a figure
             cmd += ["--glow-not-on-head", "--glow-not-on-hands"]
         cmd += ["--look", look]  # always named: game_ready.py itself still defaults to stylized
         return Job("figure", cmd, result)
