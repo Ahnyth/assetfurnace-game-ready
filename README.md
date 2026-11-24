@@ -30,7 +30,8 @@ Give it the GLB from Rig (or Animate). It writes one GLB with:
   a thin line is judged in centimetres, so a figure glows the same however much of the atlas its face takes; at most
   8 % of the figure glows (since 0.1.11: a knight's eye-slit red also matched his dark red cape faintly and lit a
   quarter of him; past 8 % the glow is narrowed, and dropped if it stays past it); **Glow where: eyes only** keeps the
-  glow on the head alone, for eyes whose colour the body shares;
+  glow on the head alone, for eyes whose colour the body shares (since 0.1.12 only skin plainly the head's, not a neck
+  it shares);
 - a **look**: `clean` (the default since 0.1.7), which mirrors a fifth of a bright room's light, so a dark coat stays
   dark and colours stay full in engines and viewers that light with a bright environment, or `stylized`, the usual
   material, whose sheen lifted a figure's darkest tones from 7 to 29 of 255 and halved its colour;
