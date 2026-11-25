@@ -124,12 +124,14 @@ def plan(argv: Sequence[str]) -> Job:
             cmd += ["--glow-max-area", "1"]
         cmd += ["--look", look]  # always named: game_ready.py itself still defaults to stylized
         return Job("figure", cmd, result)
-    if len(args) != 8:
-        raise SystemExit("usage: addon_run.py -- OUT_DIR prop MODEL FRONT AXIS SIZE LODS COLLIDER")
-    model, front, axis, size, lods, collider = args[2:]
+    if len(args) not in (8, 9):
+        raise SystemExit("usage: addon_run.py -- OUT_DIR prop MODEL FRONT AXIS SIZE LODS COLLIDER [GLOW]")
+    model, front, axis, size, lods, collider = args[2:8]
     cmd = [str(Path(model)), str(out_dir), "--name", stem, f"--front={_pick('front', front, FRONT)}",
            f"--{_pick('axis', axis, AXIS)}", _number("size", size), "--lods", _pick("lods", lods, LODS),
            "--collider", _pick("collider", collider, COLLIDER)]
+    for colour in glow_colours(args[8] if len(args) == 9 else ""):  # a glow without a rig (ember cracks, eyes)
+        cmd += ["--glow", colour]
     return Job("prop", cmd, result, lod0=out_dir / f"{stem}_LOD0.glb")
 
 

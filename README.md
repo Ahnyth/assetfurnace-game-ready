@@ -35,7 +35,9 @@ Give it the GLB from Rig (or Animate). It writes one GLB with:
   only** asks for the glow on the head alone in any case (only skin plainly the head's, not a neck it shares, since
   0.1.12); **Glow where: body and head** (since 0.1.14) lets the head glow beside the body lines, for a figure
   meant to have both (a glowing circlet and glowing lines; the hands stay dark); **Let large areas glow** turns the
-  8 % cap off, for a figure meant to glow wide (runes all over, a lava golem);
+  8 % cap off, for a figure meant to glow wide (runes all over, a lava golem); since 0.1.15 no glow on slivers of
+  hair in the glow's own colour (a red glow for a coat's trims lit the brightest bits of red hair as flecks: a bit
+  with the same red all round that is no brighter than it stays paint, trims and bright lines on dark plates glow);
 - a **look**: `clean` (the default since 0.1.7), which mirrors a fifth of a bright room's light, so a dark coat stays
   dark and colours stay full in engines and viewers that light with a bright environment, or `stylized`, the usual
   material, whose sheen lifted a figure's darkest tones from 7 to 29 of 255 and halved its colour;
@@ -53,7 +55,8 @@ Give it the GLB from Rig (or Animate). It writes one GLB with:
 Give it a finished prop (Finish's GLB). It turns its front to +Z (glTF's and Unity's forward), scales it to its real
 height, length or width, puts the pivot at the bottom centre, and writes LODs (each baked from LOD0, maps
 compressed) and a box or convex-hull collider beside it (the hull built on Blender 5.2 again since 0.1.10), with `<run>.prop.json` saying what it did. The result is
-LOD0.
+LOD0. Since 0.1.15 **Glow colours** gives a model without a rig its glow (a slime's eyes, a rock creature's ember
+cracks): the figure's glow rules on the prop's own paint, any width, at most 8 % of it, written into every LOD.
 
 ## What it does on your machine
 

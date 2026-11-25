@@ -137,6 +137,22 @@ def test_prop_lod0_is_the_result():
     assert job.lod0 == Path("/o/crate-2/crate-2_LOD0.glb")
 
 
+def test_a_prop_glows_in_the_colours_named():
+    # a slime's eyes, a rock creature's ember cracks: a glow without a rig (since 0.1.15)
+    argv = addon_run.plan(prop_args() + ["#ff9a2e, #29e6ff"]).argv
+    assert [argv[i + 1] for i, a in enumerate(argv) if a == "--glow"] == ["#ff9a2e", "#29e6ff"]
+
+
+def test_a_prop_without_glow_colours_has_no_glow():
+    assert "--glow" not in addon_run.plan(prop_args()).argv
+    assert "--glow" not in addon_run.plan(prop_args() + ["none"]).argv
+
+
+def test_a_prop_glow_that_is_not_a_colour_is_refused():
+    with pytest.raises(SystemExit, match="colour"):
+        addon_run.plan(prop_args() + ["ember"])
+
+
 def test_unknown_tool():
     with pytest.raises(SystemExit, match="tool"):
         addon_run.plan(["blender", "--", "/o/x", "vehicle", "a"])
